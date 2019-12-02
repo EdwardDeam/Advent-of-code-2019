@@ -27,19 +27,23 @@ namespace DayTwo
                 int b = memory[cursor + 2];
                 int location = memory[cursor + 3];
 
-                if(memory[cursor] == 1) {
+                if(memory[cursor] == 1) 
+                {
                     memory[location] = memory[a] + memory[b];
                 }
-                else if(memory[cursor] == 2) {
+                else if(memory[cursor] == 2) 
+                {
                     memory[location] = memory[a] * memory[b];
                 }
-                else if(memory[cursor] == 99) {
+                else if(memory[cursor] == 99) 
+                {
                     break;
                 }
                     cursor += 4;
             }
             return memory[0];
         }
+
         static int[] FindOutput(int[] memory, int goal) 
         {
             for(int i = 0; i < memory.Length; i++) 
