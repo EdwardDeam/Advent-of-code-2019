@@ -5,7 +5,7 @@ using System.IO;
 
 namespace DayThree
 {
-  class MantattanDistance
+  class ManhattanDistance
   {
     static void Main(string[] args)
     {
@@ -20,7 +20,7 @@ namespace DayThree
       // {
       //   System.Console.WriteLine("\n");
       //     foreach(var coord in line){
-      //       System.Console.WriteLine(coord.ToString());
+      //       System.Console.WriteLine(coord.ToString());  
       //     }
       // }
       List<Coord> intersections = FindIntersections(paths);
@@ -28,10 +28,111 @@ namespace DayThree
       // foreach(var coord in intersections){
       //   System.Console.WriteLine(coord.ToString() );
       // }
-      int answer = ShortestMahattan(intersections);
-      System.Console.WriteLine("\nThe Shorteset Distance is: " + answer.ToString());
+      int manhattanDist;
+      Coord closest = ClosestCoord(intersections, out manhattanDist);
+      int numSteps = FindSteps(closest, paths);
+      System.Console.WriteLine("\nThe Shorteset Distance is: " + manhattanDist.ToString());
+      System.Console.WriteLine("The number of steps is: " + numSteps.ToString());
     }
 
+    
+    private static int FindSteps(Coord goal, List<List<Coord>> paths)
+    {
+      System.Console.WriteLine("PATH A");
+      int pathASteps = TraversePath(goal, paths[0]);
+      System.Console.WriteLine("PATH B");
+      int pathBSteps = TraversePath(goal, paths[1]);
+      return pathASteps + pathBSteps;
+    }
+    private static int TraversePath(Coord goal, List<Coord> path)
+    {
+      System.Console.WriteLine("GOAL******: " + goal.ToString());
+      int steps = 0;
+      Coord previous = path[0];
+      for (int i = 1; i < path.Count; i++)
+      {
+        Coord current = path[i];
+        // Find orientation of line.
+        int dx = previous.x - current.x;
+        int dy = previous.y - current.y;
+        System.Console.WriteLine("DX: " + dx.ToString() + ", DY: " + dy.ToString());
+        if (dx == 0) // Vertical
+        {
+          // direction to goal
+          System.Console.WriteLine("Vertical");
+          if (goal.x == current.x) // lines are on the same x plane
+          {
+            if (InRange(goal.y, previous.y, current.y))
+            {
+              // The Goal has been hit.
+              // int absY = dy > 0 ? dy : -1 * dy;
+              int absPrevY = previous.y > 0 ? previous.y : -1 * previous.y;
+              int absGoalY = goal.y > 0 ? goal.y : -1 * goal.y;
+              if(absPrevY < goal.y)
+              {
+                // Heading Up
+                int testdist = goal.y - previous.y;
+                steps += testdist > 0 ? testdist : -1 * testdist;
+                System.Console.WriteLine("1.1This Step: " + testdist);
+              }
+              else
+              {
+                System.Console.WriteLine("CURRENT: " + previous.ToString());
+                System.Console.WriteLine("G: " + goal.y + ", C: " + previous.y);
+                int testdist = goal.y - previous.y;
+                steps += testdist > 0 ? testdist : -1 * testdist;
+                System.Console.WriteLine("1.2This Step: " + testdist);
+              }
+            }
+          }
+          else
+          {
+            // Add the distance to steps
+            int test = dy > 0 ? dy : -1 * dy;
+            System.Console.WriteLine("2This Step: " + test);
+            steps += test;
+          }
+        }
+        else // Horizontal
+        {
+          System.Console.WriteLine("Horizontal");
+          if (goal.y == current.y) // lines are on the same y plane
+          {
+            if (InRange(goal.x, previous.x, current.x))
+            {
+              // The Goal has been hit.
+              // int absY = dy > 0 ? dy : -1 * dy;
+              int absPrevX = previous.x > 0 ? previous.x : -1 * previous.x;
+              int absGoalX = goal.x > 0 ? goal.x : -1 * goal.x;
+              if(absPrevX < goal.x)
+              {
+                // Heading Right
+                int testdist = previous.x - goal.x;
+                steps += testdist > 0 ? testdist : -1 * testdist;
+                System.Console.WriteLine("3This Step: " + testdist);
+              }
+              else
+              {
+                // Heading Left
+                int testdist = previous.x - goal.x;
+                steps += testdist > 0 ? testdist : -1 * testdist;
+                System.Console.WriteLine("3This Step: " + testdist);
+              }
+            }
+          }
+          else
+          {
+            // Add the distance to steps
+            int test = dx > 0 ? dx : -1 * dx;
+            System.Console.WriteLine("4This Step: " + test);
+            steps += test;
+          }
+        }
+        System.Console.WriteLine("Steps: " + steps.ToString() + "\n");
+        previous = current;
+      }
+      return steps;
+    }
     static List<List<Coord>> GeneratePathFromFile(string path)
     {
       List<List<Coord>> results = new List<List<Coord>>();
@@ -105,7 +206,7 @@ namespace DayThree
         for (int j = 1; j < pathB.Count; j++)
         {
           Coord current2 = pathB[j];
-          if(CompareLines(previous1, current1, previous2, current2))
+          if (CompareLines(previous1, current1, previous2, current2))
           {
             var t = GetIntersectingCoord(previous1, current1, previous2, current2);
             intersections.Add(t);
@@ -155,24 +256,29 @@ namespace DayThree
       }
     }
 
-    private static int ShortestMahattan(List<Coord> coords)
+    private static Coord ClosestCoord(List<Coord> coords, out int manhatan)
     {
-      // Coord shortest = new Coord(0,0);
+      Coord closest = new Coord(0, 0);
       int shortest = int.MaxValue;
-      foreach(Coord c in coords) {
+      foreach (Coord c in coords)
+      {
         // Ignore the intersection at the origin.
-        if(c.x == 0 && c.y == 0){
+        if (c.x == 0 && c.y == 0)
+        {
           continue;
         }
         // Get Absolute values
         int x = c.x > 0 ? c.x : -1 * c.x;
         int y = c.y > 0 ? c.y : -1 * c.y;
         int distance = x + y;
-        if(distance < shortest) {
+        if (distance < shortest)
+        {
+          closest = c;
           shortest = distance;
         }
       }
-      return shortest;
+      manhatan = shortest;
+      return closest;
     }
     // Check if a value is in a range, compensates for reversed min,max values
     private static bool InRange(int v, int a, int b)
