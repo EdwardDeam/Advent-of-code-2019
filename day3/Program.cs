@@ -30,12 +30,30 @@ namespace DayThree
       // }
       int manhattanDist;
       Coord closest = ClosestCoord(intersections, out manhattanDist);
-      int numSteps = FindSteps(closest, paths);
+      int numSteps = FindLeastSteps(intersections, paths);
       System.Console.WriteLine("\nThe Shorteset Distance is: " + manhattanDist.ToString());
       System.Console.WriteLine("The number of steps is: " + numSteps.ToString());
     }
 
-    
+    private static int FindLeastSteps(List<Coord> intersections, List<List<Coord>> paths)
+    {
+      int shortest = int.MaxValue;
+      foreach(Coord goal in intersections)
+      {
+        if(goal.x == 0 && goal.y ==0)
+        {
+          continue;
+        }
+        System.Console.WriteLine("NEW");
+        int dist = FindSteps(goal, paths);
+        System.Console.WriteLine("|||||LEAST DIST: " + dist.ToString());
+        if(dist < shortest)
+        {
+          shortest = dist;
+        }
+      }
+      return shortest;
+    }
     private static int FindSteps(Coord goal, List<List<Coord>> paths)
     {
       System.Console.WriteLine("PATH A");
@@ -74,6 +92,7 @@ namespace DayThree
                 int testdist = goal.y - previous.y;
                 steps += testdist > 0 ? testdist : -1 * testdist;
                 System.Console.WriteLine("1.1This Step: " + testdist);
+                break;
               }
               else
               {
@@ -82,6 +101,7 @@ namespace DayThree
                 int testdist = goal.y - previous.y;
                 steps += testdist > 0 ? testdist : -1 * testdist;
                 System.Console.WriteLine("1.2This Step: " + testdist);
+                break;
               }
             }
           }
@@ -95,7 +115,7 @@ namespace DayThree
         }
         else // Horizontal
         {
-          System.Console.WriteLine("Horizontal");
+          // System.Console.WriteLine("Horizontal");
           if (goal.y == current.y) // lines are on the same y plane
           {
             if (InRange(goal.x, previous.x, current.x))
@@ -109,14 +129,16 @@ namespace DayThree
                 // Heading Right
                 int testdist = previous.x - goal.x;
                 steps += testdist > 0 ? testdist : -1 * testdist;
-                System.Console.WriteLine("3This Step: " + testdist);
+                System.Console.WriteLine("3.1This Step: " + testdist);
+                break;
               }
               else
               {
                 // Heading Left
-                int testdist = previous.x - goal.x;
+                int testdist = goal.x - previous.x;
                 steps += testdist > 0 ? testdist : -1 * testdist;
-                System.Console.WriteLine("3This Step: " + testdist);
+                System.Console.WriteLine("3.2This Step: " + testdist);
+                break;
               }
             }
           }
