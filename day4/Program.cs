@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using System.Linq;
 namespace DayFour
 {
   class Program
@@ -13,7 +13,7 @@ namespace DayFour
       {
         bool decreases = DecreaseTest(i);
         bool matches = MatchTest(i);
-        if(decreases && matches)
+        if (decreases && matches)
         {
           passwords.Add(i);
         }
@@ -24,11 +24,10 @@ namespace DayFour
     {
       int previous = number % 10;
       number /= 10;
-      while(number > 0)
+      while (number > 0)
       {
         int test = number % 10;
-        // System.Console.WriteLine(previous);
-        if(previous < test)
+        if (previous < test)
         {
           return false;
         }
@@ -40,21 +39,28 @@ namespace DayFour
     private static bool MatchTest(int number)
     {
       bool matched = false;
-      int previous = number % 10;
-      number /= 10;
-      while(number > 0)
+      List<int> nums = ToDigitList(number);
+      var groups = nums.GroupBy(v => v);
+      foreach (var i in groups)
       {
-        int current = number % 10;
-        // System.Console.WriteLine(previous);
-        // System.Console.WriteLine(current + "\n");
-        if(previous == current)
+        if (i.Count() == 2)
         {
           matched = true;
+          break;
         }
-        previous = current;
-        number /= 10;
       }
       return matched;
+    }
+    private static List<int> ToDigitList(int i)
+    {
+      List<int> result = new List<int>();
+      while (i != 0)
+      {
+        result.Add(i % 10);
+        i /= 10;
+      }
+      result.Sort();
+      return result;
     }
   }
 }
